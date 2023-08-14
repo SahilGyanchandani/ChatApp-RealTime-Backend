@@ -15,6 +15,7 @@ using Minimal_Chat_Application.Hubs;
 using Minimal_Chat_Application.BusinessLogicLayer.Interfaces;
 using Minimal_Chat_Application.DataAccessLayer.Repository;
 using Minimal_Chat_Application.BusinessLogicLayer.Services;
+using StackExchange.Redis;
 
 internal class Program
 {
@@ -35,6 +36,8 @@ internal class Program
         builder.Services.AddScoped<IMessageRepository,MessageRepository>();
         builder.Services.AddScoped<IMessageService, MessageService>();
 
+        builder.Services.AddScoped<RedisConnection>();
+
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen(options =>
@@ -48,7 +51,13 @@ internal class Program
             });
             options.OperationFilter<SecurityRequirementsOperationFilter>();
         });
+        // Add SignalR 
         builder.Services.AddSignalR();
+
+
+        // Configure Redis connection
+        builder.Services.AddSingleton(ConnectionMultiplexer.Connect("localhost:6379"));
+
 
         // For Entity Framework
         var connectionString = builder.Configuration.GetConnectionString("MySqlDb");
@@ -61,20 +70,6 @@ internal class Program
         builder.Services.AddIdentity<IdentityUser, IdentityRole>()
              .AddEntityFrameworkStores<AppDbContext>()
              .AddDefaultTokenProviders();
-
-       // //Adding Google Authentication
-       // builder.Services.AddAuthentication(options =>
-       // {
-       //     options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-       //     options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
-       // })
-       //.AddCookie()
-       //.AddGoogle(googleOptions =>
-       // {
-       //     googleOptions.ClientId = (builder.Configuration.GetSection("Authentication:Google:ClientId").Value);
-       //     googleOptions.ClientSecret = (builder.Configuration.GetSection("Authentication:Google:ClientSecret").Value);
-       // });
-
 
         builder.Services.AddAuthentication(options =>
         {
@@ -99,23 +94,6 @@ internal class Program
               options.ClientSecret = (builder.Configuration.GetSection("Authentication:Google:ClientSecret").Value);
           });
 
-        //for Serilog 
-        //builder.Host.UseSerilog((hostingContext, LoggerConfig) =>
-        //{
-        //    LoggerConfig.ReadFrom.Configuration(hostingContext.Configuration);
-        //});
-
-        //Cors
-        //builder.Services.AddCors(options =>
-        //{
-        //    options.AddDefaultPolicy(builder =>
-        //    {
-        //        builder.AllowAnyOrigin()
-        //               .AllowAnyMethod()
-        //               .AllowAnyHeader()
-        //               .AllowCredentials();
-        //    });
-        //});
         builder.Services.AddCors(
             options =>
             {
@@ -129,14 +107,8 @@ internal class Program
                     });
             });
 
-
-
-
         var app = builder.Build();
        
-
-        //app.UseRequestLoggingMiddleware();
-        //app.UseHttpLogging();
 
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
@@ -160,9 +132,5 @@ internal class Program
 
         app.Run();
     }
-
- 
-
-   
 
 }

@@ -18,13 +18,14 @@ namespace Minimal_Chat_Application.BusinessLogicLayer.Services
         private readonly IMessageRepository _messageRepository;
         private readonly IUserRepository _userRepository;
         private readonly IHubContext<ChatHub> _hubContext;
-        private readonly static ConnectionMapping<string> _connections = new ConnectionMapping<string>();
+        private readonly RedisConnection _connection;
 
-        public MessageService(IMessageRepository messageRepository, IUserRepository userRepository, IHubContext<ChatHub> hubContext)
+        public MessageService(IMessageRepository messageRepository, IUserRepository userRepository, IHubContext<ChatHub> hubContext,RedisConnection connection)
         {
             _messageRepository = messageRepository;
             _userRepository = userRepository;
             _hubContext = hubContext;
+            _connection = connection;
         }
 
         public async Task<IEnumerable<MessageResponse>> GetConversationHistory(string userId, DateTime? before, int count, string sort, string currentUserEmail)
@@ -75,10 +76,12 @@ namespace Minimal_Chat_Application.BusinessLogicLayer.Services
 
             message = await _messageRepository.SendMessageAsync(message);
             //For Receive Message in hub
-            foreach (var connectionId in _connections.GetConnections(message.ReceiverID))
+            var connectionId = await _connection.GetConnIdAsync(message.ReceiverID);
+            if(connectionId !=null)
             {
-                await _hubContext.Clients.Client(connectionId).SendAsync("BroadCast", message);
+                await _hubContext.Clients.Client(Convert.ToString(connectionId)).SendAsync("BroadCast", message);
             }
+
             //For All Client in hub
             //await _hubContext.Clients.All.Broadcast(message);
 
