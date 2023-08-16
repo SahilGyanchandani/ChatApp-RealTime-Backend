@@ -11,8 +11,8 @@ using Minimal_Chat_Application.DataAccessLayer.Data;
 namespace Minimal_Chat_Application.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20230801085528_apilogUpdate")]
-    partial class apilogUpdate
+    [Migration("20230816084213_Initial Create")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

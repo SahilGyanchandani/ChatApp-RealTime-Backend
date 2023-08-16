@@ -96,7 +96,6 @@ namespace Minimal_Chat_Application.BusinessLogicLayer.Services
 
             return response;
         }
-       
 
         public async Task EditMessage(int msgId, EditMessage edit, string currentUserEmail)
         {
@@ -154,7 +153,6 @@ namespace Minimal_Chat_Application.BusinessLogicLayer.Services
 
             return response;
         }
-
 
     }
 }
