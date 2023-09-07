@@ -1,5 +1,4 @@
-﻿using Azure.Identity;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Minimal_Chat_Application.BusinessLogicLayer.Interfaces;
 using Minimal_Chat_Application.DataAccessLayer.Interfaces;
 using Minimal_Chat_Application.ParameterModels;
