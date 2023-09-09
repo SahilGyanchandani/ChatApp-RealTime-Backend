@@ -26,6 +26,7 @@ namespace Minimal_Chat_Application.DataAccessLayer.Repository
 
         public async Task<List<Message>> GetConversationHistoryAsync(string userId, string receiverId, DateTime? before, int count, bool isAscending)
         {
+
             var messages = await _context.Messages
                 .Where(m => m.Id == userId && m.ReceiverID == receiverId || m.Id == receiverId && m.ReceiverID == userId)
                 .Where(m => before == null || (isAscending ? m.Timestamp < before : m.Timestamp > before))
@@ -34,7 +35,6 @@ namespace Minimal_Chat_Application.DataAccessLayer.Repository
                 .ToListAsync();
 
             return messages;
-
         }
 
         public async Task<Message> SendMessageAsync(Message message)
